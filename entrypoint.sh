@@ -39,6 +39,12 @@ if [ $IS_FIRST_CONFIGURATION = true ];
 then
     printf "This is the FIRST RUN.\n";
 
+    printf "Allowing root account access via ssh.\n";
+    sed -i -e 's/^root:!:/root::/' /etc/shadow;
+
+    printf "Setting bash as default shell.\n";
+    sed -i 's/\/bin\/ash/\/bin\/bash/g' /etc/passwd;
+
     if [ -z "$( ls -Fla $DIR_CONF | grep .pub )" ];
     then
         printf "Configuring SSH server keys.\n";
@@ -83,6 +89,6 @@ $DIR_SCRIPTS/envsubst-files.sh "$SUFFIX_TEMPLATE" "$DIR_CONF_TEMPLATES" "$DIR_CO
 
 printf "Starting SSH server.\n";
 
-$SSHD_EXECUTABLE;
+$SSHD_EXECUTABLE -E /var/log/sshd.log;
 
 sleep infinity;
